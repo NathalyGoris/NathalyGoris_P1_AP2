@@ -143,6 +143,7 @@ fun SistemaBodyScreen(
                             color = Color.Green,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(16.dp)
+
                         )
                     }
                 )
