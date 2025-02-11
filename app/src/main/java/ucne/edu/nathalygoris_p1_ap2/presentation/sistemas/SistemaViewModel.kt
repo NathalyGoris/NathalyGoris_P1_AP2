@@ -13,14 +13,17 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class SistemaViewModel @Inject constructor(
+class SistemasViewModel @Inject constructor(
     private val sistemaRepository: SistemaRepository
 ): ViewModel(){
+
     private val _uiState = MutableStateFlow(UiState())
     val uiState get() = _uiState.asStateFlow()
+
     init{
         getSistemas()
     }
+
     fun getSistemas(){
         viewModelScope.launch {
             sistemaRepository.getAll().collect{sistemas ->
@@ -30,18 +33,20 @@ class SistemaViewModel @Inject constructor(
             }
         }
     }
+
     fun saveSistemas(){
         viewModelScope.launch {
-            if(_uiState.value.nombre.isBlank()){
+            if(_uiState.value.nombre.isBlank() || _uiState.value.precio == null){
                 _uiState.update {
-                    it.copy(errorMessage = "Este campo no debe estar vacio.", successMessage = null)
+                    it.copy(errorMessage = "Debe completar todos los campos.", successMessage = null)
                 }
                 return@launch
             }
+
             try {
                 sistemaRepository.saveSistema(_uiState.value.toEntity())
                 _uiState.update {
-                    it.copy(successMessage = "Se ha guardado correctamente.", errorMessage = null)
+                    it.copy(successMessage = "Ha sido guardado correctamente.", errorMessage = null)
                 }
                 nuevoSistema()
             }catch (e: Exception){
@@ -51,6 +56,7 @@ class SistemaViewModel @Inject constructor(
             }
         }
     }
+
     fun nuevoSistema(){
         _uiState.update {
             it.copy(
@@ -59,21 +65,23 @@ class SistemaViewModel @Inject constructor(
             )
         }
     }
+
     fun deleteSistema(){
         viewModelScope.launch {
             try{
                 sistemaRepository.delete(_uiState.value.toEntity())
                 _uiState.update {
-                    it.copy(successMessage = "Se ha guardado correctamente.", errorMessage = null)
+                    it.copy(successMessage = "Ha sido eliminado correctamente.", errorMessage = null)
                 }
                 nuevoSistema()
             }catch (e: Exception){
                 _uiState.update {
-                    it.copy(errorMessage = "No se ha podido guardar, verifique nuevamente.", successMessage = null)
+                    it.copy(errorMessage = "No se ha podido guardar.", successMessage = null)
                 }
             }
         }
     }
+
     fun selectSistema(sistemaId: Int){
         viewModelScope.launch {
             val sistema = sistemaRepository.find(sistemaId)
@@ -81,29 +89,43 @@ class SistemaViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         sistemaId = sistema?.sistemaId,
-                        nombre = sistema?.nombre ?:""
+                        nombre = sistema?.nombre ?:"",
+                        precio = sistema?.precio
                     )
                 }
             }
         }
     }
+
     fun onNombreChange(nombre: String){
         _uiState.update {
             it.copy(nombre = nombre)
         }
     }
+
+    fun onPrecioChange(newPrecio: String){
+        val precioDouble = newPrecio.toDoubleOrNull()
+        _uiState.update {
+            it.copy(precio = precioDouble)
+        }
+    }
+
     fun clearMessages(){
         _uiState.update {
             it.copy(errorMessage = null, successMessage = null)
         }
     }
+
     fun UiState.toEntity() = SistemaEntity(
         sistemaId = sistemaId,
-        nombre = nombre
+        nombre = nombre,
+        precio = precio ?: 0.0
     )
+
     data class UiState(
         val sistemaId: Int? = null,
         val nombre: String = "",
+        val precio: Double? = null,
         val errorMessage: String? = null,
         val successMessage: String? = null,
         val sistemas: List<SistemaEntity> = emptyList()

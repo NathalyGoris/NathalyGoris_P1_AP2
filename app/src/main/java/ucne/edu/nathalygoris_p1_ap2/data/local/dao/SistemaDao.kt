@@ -1,6 +1,5 @@
 package ucne.edu.nathalygoris_p1_ap2.data.local.dao
 
-
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
@@ -9,14 +8,13 @@ import kotlinx.coroutines.flow.Flow
 import ucne.edu.nathalygoris_p1_ap2.data.local.entities.SistemaEntity
 
 @Dao
-interface SistemasDao {
+interface SistemaDao {
     @Upsert
-    suspend fun save(entity: SistemaEntity)
+    suspend fun save(sistema: SistemaEntity)
 
     @Query("""
-        SELECT * 
-        FROM Entity
-        WHERE entityId = :id
+        SELECT * FROM Sistemas
+        WHERE sistemaId = :id
         LIMIT 1
     """)
     suspend fun find(id: Int): SistemaEntity?
@@ -24,6 +22,6 @@ interface SistemasDao {
     @Delete
     suspend fun delete(sistema: SistemaEntity)
 
-    @Query("SELECT * FROM Entity")
+    @Query("SELECT * FROM Sistemas")
     fun getAll(): Flow<List<SistemaEntity>>
 }

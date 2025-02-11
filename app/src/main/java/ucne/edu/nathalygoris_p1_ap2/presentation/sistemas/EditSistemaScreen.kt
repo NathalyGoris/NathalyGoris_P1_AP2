@@ -1,5 +1,6 @@
 package ucne.edu.nathalygoris_p1_ap2.presentation.sistemas
 
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun EditSistemaScreen(
-    viewModel: SistemaViewModel = hiltViewModel(),
+    viewModel: SistemasViewModel = hiltViewModel(),
     sistemaId: Int,
     goBack: () -> Unit
 ) {
@@ -44,6 +44,7 @@ fun EditSistemaScreen(
     EditSistemaBodyScreen(
         uiState = uiState,
         onNombresChange = viewModel::onNombreChange,
+        onPrecioChange = viewModel::onPrecioChange,
         save = viewModel::saveSistemas,
         goBack = goBack
     )
@@ -52,8 +53,9 @@ fun EditSistemaScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditSistemaBodyScreen(
-    uiState: SistemaViewModel.UiState,
+    uiState: SistemasViewModel.UiState,
     onNombresChange: (String) -> Unit,
+    onPrecioChange: (String) -> Unit,
     save: () -> Unit,
     goBack: () -> Unit
 ) {
@@ -62,23 +64,23 @@ fun EditSistemaBodyScreen(
             SmallTopAppBar(
                 title = {
                     Text(
-                        text = "Editar Sistema",
+                        text = "Editar",
                         style = TextStyle(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = Color.LightGray
                         )
                     )
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = Color(0xFF6200EE)
+                    containerColor = Color.Magenta
                 ),
                 navigationIcon = {
                     IconButton(onClick = { goBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Regresar",
-                            tint = Color.White
+                            contentDescription = "Volver",
+                            tint = Color.LightGray
                         )
                     }
                 }
@@ -99,6 +101,23 @@ fun EditSistemaBodyScreen(
             )
 
             Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = "Precio") },
+                value = uiState.precio?.toString() ?: "",
+                onValueChange = { input ->
+                    try {
+                        onPrecioChange(input.toDoubleOrNull()?.toString() ?: "")
+                    } catch (e: NumberFormatException) {
+                        onPrecioChange("")
+                    }
+                },
+                isError = uiState.precio == null
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -1,6 +1,5 @@
 package ucne.edu.nathalygoris_p1_ap2.presentation.sistemas
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun DeleteScreen(
-    viewModel: SistemaViewModel = hiltViewModel(),
+fun DeleteSistemaScreen(
+    viewModel: SistemasViewModel = hiltViewModel(),
     sistemaId: Int,
     goBack: () -> Unit
 ) {
@@ -37,7 +36,7 @@ fun DeleteScreen(
         viewModel.selectSistema(sistemaId)
     }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    DeleteBodyScreen(
+    DeleteSistemaBodyScreen(
         uiState = uiState,
         onDeleteSistema = {
             viewModel.deleteSistema()
@@ -48,15 +47,15 @@ fun DeleteScreen(
 }
 
 @Composable
-fun DeleteBodyScreen(
-    uiState: SistemaViewModel.UiState,
+fun DeleteSistemaBodyScreen(
+    uiState: SistemasViewModel.UiState,
     onDeleteSistema: () -> Unit,
     goBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
             Text(
-                text = "¿Está seguro de eliminar el sistema?",
+                text = "¿Quieres eliminar este sistema?",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
@@ -97,7 +96,15 @@ fun DeleteBodyScreen(
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
 
-
+                    Text(
+                        text = "Precio: ${uiState.precio}",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        ),
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
                 }
             }
 

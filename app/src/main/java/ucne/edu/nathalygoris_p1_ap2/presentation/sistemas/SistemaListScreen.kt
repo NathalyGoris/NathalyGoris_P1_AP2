@@ -35,46 +35,47 @@ import kotlinx.coroutines.launch
 import ucne.edu.nathalygoris_p1_ap2.data.local.entities.SistemaEntity
 
 @Composable
-fun SystemListScreen(
+fun SistemaListScreen(
     drawerState: DrawerState,
     scope: CoroutineScope,
-    viewModel: SistemaViewModel = hiltViewModel(),
-    addSystem: () -> Unit,
-    editSystem: (Int) -> Unit,
-    deleteSystem: (Int) -> Unit
+    viewModel: SistemasViewModel = hiltViewModel(),
+    createSistema: () -> Unit,
+    onEditSistema: (Int) -> Unit,
+    onDeleteSistema: (Int) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    SystemListBodyScreen(
+    SistemaListBodyScreen(
         drawerState = drawerState,
         scope = scope,
         uiState = uiState,
-        addSystem = addSystem,
-        editSystem = editSystem,
-        deleteSystem = deleteSystem
+        createSistema = createSistema,
+        onEditSistema = onEditSistema,
+        onDeleteSistema = onDeleteSistema
     )
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SystemListBodyScreen(
+fun SistemaListBodyScreen(
     drawerState: DrawerState,
     scope: CoroutineScope,
-    uiState: SistemaViewModel.UiState,
-    addSystem: () -> Unit,
-    editSystem: (Int) -> Unit,
-    deleteSystem: (Int) -> Unit
+    uiState: SistemasViewModel.UiState,
+    createSistema: () -> Unit,
+    onEditSistema: (Int) -> Unit,
+    onDeleteSistema: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Available Systems",
+                        text = "Lista de Sistemas",
                         style = TextStyle(
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = Color.LightGray
                         )
                     )
                 },
@@ -82,22 +83,22 @@ fun SystemListBodyScreen(
                     IconButton(onClick = {
                         scope.launch { drawerState.open() }
                     }) {
-                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Open menu")
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = "Menú")
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF1976D2)
+                    containerColor = Color.Magenta
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = addSystem,
+                onClick = createSistema,
                 modifier = Modifier.padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
+                containerColor = Color(0xFFFF00FF),
+                contentColor = Color.LightGray
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "New System")
+                Icon(Icons.Filled.Add, contentDescription = "Añadir ")
             }
         }
     ) { paddingValues ->
@@ -113,7 +114,7 @@ fun SystemListBodyScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(uiState.sistemas) { sistema ->
-                    SystemRow(sistema, editSystem, deleteSystem)
+                    SistemaRow(sistema, onEditSistema, onDeleteSistema)
                 }
             }
         }
@@ -121,10 +122,10 @@ fun SystemListBodyScreen(
 }
 
 @Composable
-fun SystemRow(
-    system: SistemaEntity,
-    editSystem: (Int) -> Unit,
-    deleteSystem: (Int) -> Unit
+fun SistemaRow(
+    sistema: SistemaEntity,
+    onEditSistema: (Int) -> Unit,
+    onDeleteSistema: (Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -148,18 +149,25 @@ fun SystemRow(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "ID: ${system.sistemaId}",
+                    text = "SistemaId: ${sistema.sistemaId}",
                     style = TextStyle(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = Color.White
                     )
                 )
                 Text(
-                    text = "Name: ${system.nombre}",
+                    text = "Nombre: ${sistema.nombre}",
                     style = TextStyle(
                         fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        color = Color.White
+                    )
+                )
+                Text(
+                    text = "Precio: ${sistema.precio}",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        color = Color.White
                     )
                 )
             }
@@ -181,7 +189,7 @@ fun SystemRow(
                     leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = "Editar") },
                     onClick = {
                         expanded = false
-                        editSystem(system.sistemaId!!)
+                        onEditSistema(sistema.sistemaId!!)
                     }
                 )
                 DropdownMenuItem(
@@ -189,7 +197,7 @@ fun SystemRow(
                     leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = "Eliminar") },
                     onClick = {
                         expanded = false
-                        deleteSystem(system.sistemaId!!)
+                        onDeleteSistema(sistema.sistemaId!!)
                     }
                 )
             }
